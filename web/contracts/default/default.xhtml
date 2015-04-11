@@ -18,6 +18,7 @@
                 <h:form id="menuForm">
                     <p:menubar model="#{systemBean.model}" styleClass="mainMenu">  
                         <f:facet name="options">
+                            <span id="loading-icon" style="display:none">LOADING ...</span>
                             <p:commandButton ajax="false" value="Logout" action="#{systemBean.logout}"/>  
                         </f:facet>  
                     </p:menubar>
@@ -28,11 +29,9 @@
                         <span class="ui-layout-unit-header-title" style="font-size: 1.1em ">
                             <ui:insert name="title"></ui:insert>
                         </span>
-                        <span id="poll" style="float:right">
-
-                        </span>
                     </div>
                     <div style="padding:2px;">
+                        <div id="loading-icon" style="float:left; display: none">Loading ...</div>
                         <ui:insert name="body"></ui:insert>
                     </div>
                 </p:outputPanel>

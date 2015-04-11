@@ -54,6 +54,11 @@ public class MongoC {
         coll.update((DBObject) JSON.parse((String) docObj.get("criteria")),
                 (DBObject) JSON.parse((String) docObj.get("update")));
     }
+    
+    public static void update(String collection, DBObject original, DBObject newObj) throws Exception {
+        DBCollection coll = getClient().getDB(database).getCollection(collection);
+        coll.update(original,newObj);
+    }
 
     public static String find(String collection, String document) throws Exception {
         DBCollection coll = getClient().getDB(database).getCollection(collection);

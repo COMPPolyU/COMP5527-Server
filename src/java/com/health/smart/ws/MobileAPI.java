@@ -10,7 +10,6 @@ import com.google.gson.JsonObject;
 import com.health.smart.ejb.MongoEJB;
 import com.health.smart.ejb.SystemEJB;
 import com.health.smart.entity.DayMeasurement;
-import com.health.smart.entity.Measurement;
 import com.health.smart.util.GsonHelper;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -57,43 +56,19 @@ public class MobileAPI {
 
     @POST
     @Path("/savemeasurement")
-    public Response saveMeasurement(String payload){
-           try {
+    public Response saveMeasurement(String payload) {
+        try {
             JsonObject request = GsonHelper.fromString(payload);
             String token = request.getAsJsonPrimitive("token").getAsString();
             JsonArray mess = request.getAsJsonArray("measurements");
             int pid = sysEjb.validateToken(token);
             List<DayMeasurement> measurements = new ArrayList<>();
             for (int i = 0; i < mess.size(); i++) {
-               DayMeasurement m = GsonHelper.fromJsonElement(mess.get(i), DayMeasurement.class);
+                DayMeasurement m = GsonHelper.fromJsonElement(mess.get(i), DayMeasurement.class);
                 m.setPatientId(pid);
                 measurements.add(m);
             }
             mongoEjb.saveDayMeasurement(measurements);
-            JsonObject jObject = new JsonObject();
-            jObject.addProperty("result", "success");
-            return Response.status(200).entity(jObject.toString()).build();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Response.status(500).entity(e.getMessage()).build();
-        }
-    }
-    
-    @POST
-    @Path("/savemeasurementbak")
-    public Response saveMeasurementbak(String payload) {
-        try {
-            JsonObject request = GsonHelper.fromString(payload);
-            String token = request.getAsJsonPrimitive("token").getAsString();
-            JsonArray mess = request.getAsJsonArray("measurements");
-            int pid = sysEjb.validateToken(token);
-            List<Measurement> measurements = new ArrayList<>();
-            for (int i = 0; i < mess.size(); i++) {
-                Measurement m = GsonHelper.fromJsonElement(mess.get(i), Measurement.class);
-                m.setPatientId(pid);
-                measurements.add(m);
-            }
-            mongoEjb.saveMeasurement(measurements);
             JsonObject jObject = new JsonObject();
             jObject.addProperty("result", "success");
             return Response.status(200).entity(jObject.toString()).build();
@@ -120,38 +95,9 @@ public class MobileAPI {
             System.out.println(pid);
             System.out.println(queryFrom);
             System.out.println(queryTo);
-            
+
             String result = mongoEjb.getDayMeasurement(pid, queryFrom, queryTo);
-            
-            return Response.status(200).entity(result).build();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Response.status(500).entity(e.getMessage()).build();
-        }
-    }
-    
-    @POST
-    @Path("/getmeasurementbak")
-    public Response getMeasurementBak(String payload) {
-        try {
-            JsonObject request = GsonHelper.fromString(payload);
-            String token = request.getAsJsonPrimitive("token").getAsString();
-            int pid = sysEjb.validateToken(token);
 
-            String from = request.getAsJsonPrimitive("from").getAsString();
-            String to = request.getAsJsonPrimitive("to").getAsString();
-
-            Date queryFrom = df.parse(from);
-            Date queryTo = df.parse(to);
-
-            System.out.println(pid);
-            System.out.println(queryFrom);
-            System.out.println(queryTo);
-            
-            String result = mongoEjb.getMeasurement(pid, queryFrom, queryTo);
-            
-            System.out.println(result);
-            
             return Response.status(200).entity(result).build();
         } catch (Exception e) {
             e.printStackTrace();

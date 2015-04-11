@@ -19,12 +19,12 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
@@ -46,14 +46,16 @@ public class MedicalBean implements Serializable {
     private MongoEJB mongo;
 
     private DecimalFormat df = new DecimalFormat("#.00");
-    private DateFormat dayF = new SimpleDateFormat("dd");
+    private DateFormat dayF = new SimpleDateFormat("MM/dd");
     private Patient selectedPatient = new Patient();
 
     private List<MedicalHistory> medicals = new ArrayList<>();
-    private Map<String, List<ChartData>> dataMap = new HashMap<>();
-    private Map<String, ChartSeries> chartSeriesMap = new HashMap();
-    private LineChartModel bloodPressureModel;
+
+    private LineChartModel bloodPressureHighModel;
+    private LineChartModel bloodPressureLowModel;
     private LineChartModel bloodGlucoseModel;
+
+    private String[] selectedTimes = new String[]{"AFTER_BED"};
 
     @PostConstruct
     public void refreshPatientList() {
@@ -61,67 +63,113 @@ public class MedicalBean implements Serializable {
             if (FCHelper.getParameter("patientid") != null) {
                 selectedPatient = ejb.getPatient(FCHelper.getParameter("patientid"));
             } else {
-                selectedPatient = ejb.getPatient("3");
+                selectedPatient = ejb.getPatient("1");
             }
             medicals = ejb.getPatientMedicalHistory(selectedPatient.getId());
-            List<ChartData> source = mongo.getChartData(selectedPatient.getId(), "ALL");
-            System.out.println(source.size());
-            dataMap = source.stream().collect(Collectors.groupingBy(ChartData::getType));
-            createChartSeries();
-            createModel();
+            refresh();
         } catch (Exception e) {
             e.printStackTrace();
             FCHelper.addError(e);
         }
     }
 
-    private void createChartSeries() {
-        for (String s : dataMap.keySet()) {
-            ChartSeries cs = new ChartSeries();
-            List<ChartData> data = dataMap.get(s);
-            Collections.sort(data);
-            for (ChartData d : data) {
-                cs.set(dayF.format(d.getDate()), d.getValue());
+    public void refresh() throws Exception {
+        createModel();
+        List<ChartData> datas = mongo.getChartData(selectedPatient.getId());
+        Collections.sort(datas);
+        createSeries(datas);
+    }
+
+    private void createSeries(List<ChartData> source) throws Exception {
+        Map<String, ChartSeries> bphLines = new HashMap<>();
+        Map<String, ChartSeries> bpLLines = new HashMap<>();
+        Map<String, ChartSeries> bgLines = new HashMap<>();
+
+        List<String> showTimes = new ArrayList();
+        if (selectedTimes != null) {
+            showTimes.addAll(Arrays.asList(selectedTimes));
+        }
+
+        for (ChartData d : source) {
+            String cat = d.getTime();
+            if (showTimes.contains(cat)) {
+                if (!bphLines.containsKey(cat)) {
+                    ChartSeries cs = new ChartSeries();
+                    cs.setLabel(cat);
+                    bphLines.put(cat, cs);
+                }
+                bphLines.get(cat).set(dayF.format(d.getDate()), d.getBph());
+                if (!bpLLines.containsKey(cat)) {
+                    ChartSeries cs = new ChartSeries();
+                    cs.setLabel(cat);
+                    bpLLines.put(cat, cs);
+                }
+                bpLLines.get(cat).set(dayF.format(d.getDate()), d.getBpl());
+                if (!bgLines.containsKey(cat)) {
+                    ChartSeries cs = new ChartSeries();
+                    cs.setLabel(cat);
+                    bgLines.put(cat, cs);
+                }
+                bgLines.get(cat).set(dayF.format(d.getDate()), d.getBg());
             }
-            chartSeriesMap.put(s, cs);
+        }
+
+        for (ChartSeries c : bphLines.values()) {
+            bloodPressureHighModel.addSeries(c);
+        }
+        for (ChartSeries c : bpLLines.values()) {
+            bloodPressureLowModel.addSeries(c);
+        }
+        for (ChartSeries c : bgLines.values()) {
+            bloodGlucoseModel.addSeries(c);
+        }
+
+        fillEmpty(bloodPressureHighModel);
+        fillEmpty(bloodPressureLowModel);
+        fillEmpty(bloodGlucoseModel);
+    }
+    
+    private void fillEmpty(LineChartModel model){
+        if (model.getSeries().isEmpty()) {
+            for (String s : selectedTimes) {
+                ChartSeries cs = new ChartSeries();
+                cs.setLabel(s);
+                cs.set(dayF.format(new Date()), 0);
+                model.addSeries(cs);
+            }
         }
     }
 
     private void createModel() throws Exception {
-        if (dataMap.containsKey("BPH") || dataMap.containsKey("BPL")) {
-            bloodPressureModel = new LineChartModel();
-            bloodPressureModel.setTitle("Blood Pressure Level");
-            bloodPressureModel.setAnimate(true);
-            bloodPressureModel.setLegendPosition("se");
-            Axis yAxis = bloodPressureModel.getAxis(AxisType.Y);
-            yAxis.setMin(50);
-            yAxis.setMax(200);
-            bloodPressureModel.getAxes().put(AxisType.X, new CategoryAxis("Time"));
-            if (dataMap.containsKey("BPH")) {
-                ChartSeries bph = chartSeriesMap.get("BPH");
-                bph.setLabel("High Blood Pressure");
-                bloodPressureModel.addSeries(bph);
-            }
-            if (dataMap.containsKey("BPL")) {
-                ChartSeries bpl = chartSeriesMap.get("BPL");
-                bpl.setLabel("Low Blood Pressure");
-                bloodPressureModel.addSeries(bpl);
-            }
-        }
+        bloodPressureHighModel = new LineChartModel();
+        bloodPressureHighModel.setTitle("Blood Pressure Level (High)");
+        bloodPressureHighModel.setAnimate(true);
+        bloodPressureHighModel.setLegendPosition("ne");
+        bloodPressureHighModel.getAxes().put(AxisType.X, new CategoryAxis("Date"));
 
-        if (dataMap.containsKey("BG")) {
-            bloodGlucoseModel = new LineChartModel();
-            bloodGlucoseModel.setTitle("Blood Glucose Level");
-            bloodGlucoseModel.setAnimate(true);
-            bloodGlucoseModel.setLegendPosition("se");
-            Axis byAxis = bloodGlucoseModel.getAxis(AxisType.Y);
-            byAxis.setMin(3);
-            byAxis.setMax(10);
-            bloodGlucoseModel.getAxes().put(AxisType.X, new CategoryAxis("Time"));
-            ChartSeries bg = chartSeriesMap.get("BG");
-            bg.setLabel("Blood Glucose");
-            bloodGlucoseModel.addSeries(bg);
-        }
+        bloodPressureLowModel = new LineChartModel();
+        bloodPressureLowModel.setTitle("Blood Pressure Level (Low)");
+        bloodPressureLowModel.setAnimate(true);
+        bloodPressureLowModel.setLegendPosition("ne");
+        bloodPressureLowModel.getAxes().put(AxisType.X, new CategoryAxis("Date"));
+
+        bloodGlucoseModel = new LineChartModel();
+        bloodGlucoseModel.setTitle("Blood Glucose Level");
+        bloodGlucoseModel.setAnimate(true);
+        bloodGlucoseModel.setLegendPosition("ne");
+        bloodGlucoseModel.getAxes().put(AxisType.X, new CategoryAxis("Date"));
+
+        Axis yAxis = bloodPressureHighModel.getAxis(AxisType.Y);
+        yAxis.setMin(100);
+        yAxis.setMax(200);
+
+        yAxis = bloodPressureLowModel.getAxis(AxisType.Y);
+        yAxis.setMin(60);
+        yAxis.setMax(120);
+
+        yAxis = bloodGlucoseModel.getAxis(AxisType.Y);
+        yAxis.setMin(3.0);
+        yAxis.setMax(10.0);
     }
 
     public String getBMI() {
@@ -155,12 +203,20 @@ public class MedicalBean implements Serializable {
         this.selectedPatient = selectedPatient;
     }
 
-    public LineChartModel getBloodPressureModel() {
-        return bloodPressureModel;
+    public LineChartModel getBloodPressureHighModel() {
+        return bloodPressureHighModel;
     }
 
-    public void setBloodPressureModel(LineChartModel bloodPressureModel) {
-        this.bloodPressureModel = bloodPressureModel;
+    public void setBloodPressureHighModel(LineChartModel bloodPressureHighModel) {
+        this.bloodPressureHighModel = bloodPressureHighModel;
+    }
+
+    public LineChartModel getBloodPressureLowModel() {
+        return bloodPressureLowModel;
+    }
+
+    public void setBloodPressureLowModel(LineChartModel bloodPressureLowModel) {
+        this.bloodPressureLowModel = bloodPressureLowModel;
     }
 
     public LineChartModel getBloodGlucoseModel() {
@@ -177,6 +233,14 @@ public class MedicalBean implements Serializable {
 
     public void setMedicals(List<MedicalHistory> medicals) {
         this.medicals = medicals;
+    }
+
+    public String[] getSelectedTimes() {
+        return selectedTimes;
+    }
+
+    public void setSelectedTimes(String[] selectedTimes) {
+        this.selectedTimes = selectedTimes;
     }
 
 }

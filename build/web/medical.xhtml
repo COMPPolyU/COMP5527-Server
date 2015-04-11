@@ -2,6 +2,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:ui="http://java.sun.com/jsf/facelets"
       xmlns:p="http://primefaces.org/ui">
 
@@ -43,10 +44,42 @@
                             </div>
                             <div class="ui-grid-col-8">
                                 <p:panel id="charts" header="Medical Measurements" style="margin-bottom:20px">
-                                    <p:chart rendered="#{not empty medicalBean.bloodPressureModel}"
-                                             type="line" model="#{medicalBean.bloodPressureModel}" style="margin-bottom: 20px; width:100%;" />
+                                    <p:selectManyCheckbox id="basic" value="#{medicalBean.selectedTimes}"  layout="grid" columns="4">
+                                        <f:selectItem itemLabel="AFTER BED" itemValue="AFTER_BED"  />
+                                        <f:selectItem itemLabel="BEFORE BREAKFAST" itemValue="BEFORE_BREAKFAST" />
+                                        <f:selectItem itemLabel="AFTER BREAKFAST" itemValue="AFTER_BREAKFAST" />
+                                        <f:selectItem itemLabel="BEFORE LUNCH" itemValue="BEFORE_LUNCH" />
+                                        <f:selectItem itemLabel="AFTER LUNCH" itemValue="AFTER_LUNCH" />
+                                        <f:selectItem itemLabel="BEFORE DINNER" itemValue="BEFORE_DINNER" />
+                                        <f:selectItem itemLabel="AFTER DINNER" itemValue="AFTER_DINNER" />
+                                        <f:selectItem itemLabel="BEFORE BED" itemValue="BEFORE_BED" />
+                                    </p:selectManyCheckbox>
+                                    <hr/>
+                                    <p:commandButton actionListener="#{medicalBean.refresh()}" process="charts" update="charts" value="Refresh Charts"/>
+                                    <hr/>
+                                    <p:tabView>
+                                        <p:tab title="Blood Pressure (High)">
+                                            <p:chart rendered="#{not empty medicalBean.bloodPressureHighModel}"
+                                                     type="line" model="#{medicalBean.bloodPressureHighModel}" 
+                                                     style="width:100%; height: 500px" />
+                                        </p:tab>
+                                        <p:tab title="Blood Pressure (Low)">
+                                            <p:chart rendered="#{not empty medicalBean.bloodPressureLowModel}" 
+                                                     type="line" model="#{medicalBean.bloodPressureLowModel}"
+                                                     style="width:100%; height: 500px" />
+                                        </p:tab>
+                                        <p:tab title="Blood Glucose">
+                                            <p:chart rendered="#{not empty medicalBean.bloodGlucoseModel}" 
+                                                     type="line" model="#{medicalBean.bloodGlucoseModel}"
+                                                     style="width:100%; height: 500px" />
+                                        </p:tab>
+                                    </p:tabView>
 
-                                    <p:chart rendered="#{not empty medicalBean.bloodGlucoseModel}"  type="line" model="#{medicalBean.bloodGlucoseModel}" style="width:100%;" />
+
+
+
+
+
                                 </p:panel>
                             </div>
                         </div>
