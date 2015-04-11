@@ -1,0 +1,44 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+
+    <h:body>
+        <ui:composition template="/default.xhtml">
+            <ui:define name="title">
+                Logged In User: #{systemBean.loggedInUser.name}
+            </ui:define>
+            <ui:define name="body">
+                <h:form id="form">
+                    <div class="ui-grid ui-grid-responsive">
+                        <div class="ui-grid-row">
+                            <div class="ui-grid-col-12">
+                                <h:form id="form">
+                                    <p:dataTable value="#{patientBean.patients}" var="p" paginator="true" 
+                                                 selection="#{messageBean.selectedPatient}" 
+                                                 paginatorPosition="bottom" rows="50" rowKey="#{p.id}">
+                                        <p:column selectionMode="single" style="width:16px;text-align:center"/>
+                                        <p:column headerText="ID"><h:outputText value="#{p.id}"/></p:column>
+                                        <p:column headerText="Email"><h:outputText value="#{p.email}"/></p:column>
+                                        <p:column headerText="Name"><h:outputText value="#{p.engName}"/></p:column>
+                                        <p:column headerText="Identity"><h:outputText value="#{p.identity}"/></p:column>
+                                        <p:column headerText="Gender"><h:outputText value="#{p.gender}"/></p:column>
+                                    </p:dataTable>
+                                    <hr/>
+                                    <h:outputText value="Message: "/><p:inputText value="#{messageBean.message}" style="width:90%"/>
+                                    <hr/>
+                                    <p:commandButton value="Send Message" update=":form" actionListener="#{messageBean.sendGCM()}"/>
+                                    <p:commandButton value="Boardcast" update=":form" actionListener="#{messageBean.boardcast()}"/>
+                                </h:form>
+                            </div>
+                        </div>
+                    </div>
+                </h:form>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

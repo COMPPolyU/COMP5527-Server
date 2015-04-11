@@ -1,0 +1,50 @@
+.noBorderGrid tr, .noBorderGrid td {
+    border: none !important;
+}
+
+.ui-datatable table {
+   table-layout: auto !important;
+}
+.max-width{
+    width: 100%;
+}
+.max-width input, textarea{
+    width:100%;
+}
+.max-width .ui-selectonemenu{
+    min-width: 100% !important;
+}
+button{
+    margin-left: 5px;
+}
+
+div[class^="ui-grid-col-"] {
+    margin-left: 2px;
+    margin-right: 2px;
+}
+
+.ui-state-disabled{
+    opacity: 0.9 !important;
+}
+
+/* override */
+.ui-widget {
+    font-size: 90%;
+}
+
+ul .ui-menu-child{
+    width:15em !important;
+}
+
+.ui-menu.ui-widget .ui-menuitem-link .ui-menuitem-text {
+  margin-left: 0.6em !important;
+  margin-right: 0.6em !important;
+}
+
+/** ClearFix **/
+.clearfix:after { content: "."; display: block; height: 0; clear: both; visibility: hidden; }
+.clearfix { display: inline-block; }
+/* required comment for clearfix to work in Opera \*/
+* html .clearfix { height:1%; }
+.clearfix { display:block; }
+

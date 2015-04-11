@@ -1,0 +1,59 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+
+    <h:body>
+        <ui:composition template="/default.xhtml">
+            <ui:define name="title">
+                Logged In User: #{systemBean.loggedInUser.name}
+            </ui:define>
+            <ui:define name="body">
+                <h:form id="form">
+                    <div class="ui-grid ui-grid-responsive">
+                        <div class="ui-grid-row">
+                            <div class="ui-grid-col-4">
+                                <p:panel id="details" header="Patient Details" style="margin-bottom:20px">
+                                    <p:panelGrid columns="2" styleClass="noBorderGrid">
+                                        Email: <h:outputText value="#{medicalBean.selectedPatient.email}" />
+                                        Identity: <h:outputText value="#{medicalBean.selectedPatient.identity}" />
+                                        Name: <h:outputText value="#{medicalBean.selectedPatient.engName}" />
+                                        Gender: <h:outputText value="#{medicalBean.selectedPatient.gender}" />
+                                        Date of Birth: <h:outputText  value="#{medicalBean.selectedPatient.dob}" />
+                                        Height (cm): <h:outputText value="#{medicalBean.selectedPatient.height}" />
+                                        Weight (kg): <h:outputText value="#{medicalBean.selectedPatient.weight}" />
+                                        BMI: <h:outputText value="#{medicalBean.getBMI()}" />
+                                        Age: <h:outputText value="#{medicalBean.getAge()}" />
+                                    </p:panelGrid>
+                                    <hr/>
+                                    <h:outputText value="Message: "/><p:inputText value="#{messageBean.message}" style="width:70%"/>
+                                    <hr/>
+                                    <p:commandButton value="Send Message" actionListener="#{messageBean.sendGCM(medicalBean.selectedPatient)}"/>
+                                </p:panel>
+                                <hr/>
+                                <p:panel id="history" header="Medical History" style="margin-bottom:20px">
+                                    <p:dataTable value="#{medicalBean.medicals}" var="m" paginator="true" paginatorPosition="bottom" rows="20" rowKey="#{m.id}">
+                                        <p:column headerText="Date"><h:outputText value="#{m.apptDate}"/></p:column>
+                                        <p:column headerText="Sympton"><h:outputText value="#{m.symptom}"/></p:column>
+                                        <p:column headerText="Medicine"><h:outputText value="#{m.medicine}"/></p:column>
+                                    </p:dataTable>
+                                </p:panel>
+                            </div>
+                            <div class="ui-grid-col-8">
+                                <p:panel id="charts" header="Medical Measurements" style="margin-bottom:20px">
+                                    <p:chart rendered="#{not empty medicalBean.bloodPressureModel}"
+                                             type="line" model="#{medicalBean.bloodPressureModel}" style="margin-bottom: 20px; width:100%;" />
+
+                                    <p:chart rendered="#{not empty medicalBean.bloodGlucoseModel}"  type="line" model="#{medicalBean.bloodGlucoseModel}" style="width:100%;" />
+                                </p:panel>
+                            </div>
+                        </div>
+                    </div>
+                </h:form>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

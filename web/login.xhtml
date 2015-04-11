@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+
+    <h:body>
+        <ui:composition template="/logon.xhtml">
+            <ui:define name="body">
+                <h:form id="loginForm">
+                    <p:panel id="basic" styleClass="centerWrapper" header="Login">
+                        <h:panelGrid styleClass="centerCell" columns="2" cellpadding="10">
+                            <p:outputLabel for="staffId" value="Net ID:" /> 
+                            <p:inputText id="staffId" value="#{systemBean.staffId}" required="true"/>
+                            <p:outputLabel for="password" value="Password:" /> 
+                            <p:password  id="password" value="#{systemBean.password}" required="true"/>
+                        </h:panelGrid>
+                        <hr/>
+                        <p:commandButton value="Login" update="loginForm" actionListener="#{systemBean.login()}"/>
+                    </p:panel>
+                </h:form>
+            </ui:define>
+        </ui:composition>
+
+    </h:body>
+</html>
+

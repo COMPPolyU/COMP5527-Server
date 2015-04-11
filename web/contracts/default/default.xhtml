@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core">
+
+    <h:head> 
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+        <h:outputStylesheet name="default.css"/>
+        <title>M.Smart Health System - #{initParam['version']}</title>
+    </h:head> 
+    <ui:insert name="header"></ui:insert>    
+    <h:body style="height: 100%; margin: 2px;">
+        <p:layout fullPage="true">
+            <p:layoutUnit position="center" style="padding:2px" >
+                <h:form id="menuForm">
+                    <p:menubar model="#{systemBean.model}" styleClass="mainMenu">  
+                        <f:facet name="options">
+                            <p:commandButton ajax="false" value="Logout" action="#{systemBean.logout}"/>  
+                        </f:facet>  
+                    </p:menubar>
+                </h:form>
+                <hr/>
+                <p:outputPanel>
+                    <div class="ui-widget-header ui-corner-all" style="padding:4px; margin-bottom: 4px;">
+                        <span class="ui-layout-unit-header-title" style="font-size: 1.1em ">
+                            <ui:insert name="title"></ui:insert>
+                        </span>
+                        <span id="poll" style="float:right">
+
+                        </span>
+                    </div>
+                    <div style="padding:2px;">
+                        <ui:insert name="body"></ui:insert>
+                    </div>
+                </p:outputPanel>
+            </p:layoutUnit>
+        </p:layout>
+        <ui:insert name="outsideLayout"></ui:insert>
+        <p:growl widgetVar="gg" showSummary="false" showDetail="true" autoUpdate="true"/>
+        <p:ajaxStatus onstart="$('#loading-icon').show()" onsuccess="$('#loading-icon').hide()"/>
+       
+    </h:body>
+    <!--<script type="text/javascript" src="js/websocket.js"></script>-->
+</html>
