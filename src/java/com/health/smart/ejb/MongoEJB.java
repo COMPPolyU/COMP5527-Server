@@ -71,7 +71,7 @@ public class MongoEJB {
         return MongoC.find("measurement", doc);
     }
 
-    @Schedule(minute = "*", hour = "*", persistent = false)
+    @Schedule(minute = "*/15", hour = "*", persistent = false)
     public void checkMeasurement() throws Exception {
         BasicDBObject gt60 = new BasicDBObject("$gte", 160);
         BasicDBObject alertExists = new BasicDBObject("$exists", false);

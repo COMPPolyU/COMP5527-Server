@@ -1,0 +1,6 @@
+com/health/smart/entity/Device_.java
+com/health/smart/entity/Patient_.java
+com/health/smart/entity/MedicalHistory_.java
+com/health/smart/entity/Message_.java
+com/health/smart/entity/Function_.java
+com/health/smart/entity/User_.java

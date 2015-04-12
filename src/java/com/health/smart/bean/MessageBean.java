@@ -6,6 +6,7 @@
 package com.health.smart.bean;
 
 import com.health.smart.ejb.GCMBean;
+import com.health.smart.ejb.MongoEJB;
 import com.health.smart.entity.Patient;
 import com.health.smart.util.FCHelper;
 import java.io.Serializable;
@@ -20,8 +21,18 @@ public class MessageBean implements Serializable {
     private static final long serialVersionUID = 1L;
     @Inject
     private GCMBean ejb;
+     @Inject
+    private MongoEJB mejb;
     private Patient selectedPatient = new Patient();
     private String message;
+    
+    public void checkMeasurement(){
+        try{
+            mejb.checkMeasurement();
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 
     public void sendGCM() {
         try {

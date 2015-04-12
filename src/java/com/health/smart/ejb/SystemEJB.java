@@ -48,8 +48,10 @@ public class SystemEJB {
                     device.setDeviceId(deviceId);
                     device.setPatientId(p.getId());
                     device.setRegisteredAt(new Date());
+                    em.persist(device);
                 } else {
                     devices.get(0).setRegisteredAt(new Date());
+                    devices.get(0).setPatientId(patientId);
                 }
             } else {
                 throw new Exception("Patient not found.");
