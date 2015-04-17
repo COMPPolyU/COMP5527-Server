@@ -81,7 +81,7 @@ public class MongoEJB {
         for (DBObject obj : result) {
             int pid = (Integer) obj.get("patientId");
             double value = (Double) obj.get("bph");
-            int success = ejb.sendMsg(pid, String.format("Your blood pressure level is too high (%s)! Please make appointment ASAP!", NumberFormat.getInstance().format(value)));
+            int success = ejb.sendMsg(pid, String.format("Systolic level too high (%s)!\r\n Please make appointment ASAP!", NumberFormat.getInstance().format(value)));
             if (success > 0) {
                 obj.put("alerted", true);
                 BasicDBObject filter = new BasicDBObject();

@@ -142,19 +142,19 @@ public class MedicalBean implements Serializable {
 
     private void createModel() throws Exception {
         bloodPressureHighModel = new LineChartModel();
-        bloodPressureHighModel.setTitle("Blood Pressure Level (High)");
+        bloodPressureHighModel.setTitle("Systolic Level");
         bloodPressureHighModel.setAnimate(true);
         bloodPressureHighModel.setLegendPosition("ne");
         bloodPressureHighModel.getAxes().put(AxisType.X, new CategoryAxis("Date"));
 
         bloodPressureLowModel = new LineChartModel();
-        bloodPressureLowModel.setTitle("Blood Pressure Level (Low)");
+        bloodPressureLowModel.setTitle("Diastolic Level");
         bloodPressureLowModel.setAnimate(true);
         bloodPressureLowModel.setLegendPosition("ne");
         bloodPressureLowModel.getAxes().put(AxisType.X, new CategoryAxis("Date"));
 
         bloodGlucoseModel = new LineChartModel();
-        bloodGlucoseModel.setTitle("Blood Glucose Level");
+        bloodGlucoseModel.setTitle("Glycemia Level");
         bloodGlucoseModel.setAnimate(true);
         bloodGlucoseModel.setLegendPosition("ne");
         bloodGlucoseModel.getAxes().put(AxisType.X, new CategoryAxis("Date"));
@@ -169,7 +169,7 @@ public class MedicalBean implements Serializable {
 
         yAxis = bloodGlucoseModel.getAxis(AxisType.Y);
         yAxis.setMin(3.0);
-        yAxis.setMax(10.0);
+        yAxis.setMax(30.0);
     }
 
     public String getBMI() {
